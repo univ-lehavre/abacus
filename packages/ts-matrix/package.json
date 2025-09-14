@@ -14,10 +14,7 @@
     "test": "jest",
     "start": "run-s build start:only",
     "start:only": "node ./dist/index.js",
-    "demo": "pnpm -s tsx demo/index.ts",
-    "publish:only": "npm publish --access public",
-    "publish:check": "npm pack --dry-run",
-    "publish": "run-s build publish:only"
+    "demo": "pnpm -s tsx demo/index.ts"
   },
   "devDependencies": {
     "@univ-lehavre/typescript-config": "workspace:^"
