@@ -1,6 +1,6 @@
 {
   "name": "@univ-lehavre/strings-clustering",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "Regroupement de chaînes de caractères par similarité",
   "author": "Pierre-Olivier Chasset",
   "license": "UNLICENSED",
@@ -14,10 +14,7 @@
     "test": "jest",
     "start": "run-s build start:only",
     "start:only": "node ./dist/index.js",
-    "demo": "pnpm -s tsx demo/index.ts",
-    "publish:only": "npm publish --access public",
-    "publish:check": "npm pack --dry-run",
-    "publish": "run-s build publish:only"
+    "demo": "pnpm -s tsx demo/index.ts"
   },
   "devDependencies": {
     "@univ-lehavre/typescript-config": "workspace:^"
@@ -25,6 +22,10 @@
   "dependencies": {
     "@univ-lehavre/ts-matrix": "workspace:^",
     "effect": "^3.17.13"
+  },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/",
+    "access": "public"
   },
   "main": "dist/univ-lehavre-strings-clustering.cjs.js",
   "module": "dist/univ-lehavre-strings-clustering.esm.js",

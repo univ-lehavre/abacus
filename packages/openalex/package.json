@@ -1,6 +1,6 @@
 {
   "name": "@univ-lehavre/openalex",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "Fouille des données OpenAlex",
   "author": "Pierre-Olivier Chasset",
   "license": "UNLICENSED",
@@ -14,10 +14,7 @@
     "test": "jest",
     "start": "run-s build start:only",
     "start:only": "node ./dist/index.js",
-    "demo": "pnpm -s tsx demo/index.ts",
-    "publish:only": "npm publish --access public",
-    "publish:check": "npm pack --dry-run",
-    "publish": "run-s build publish:only"
+    "demo": "pnpm -s tsx demo/index.ts"
   },
   "devDependencies": {
     "@types/lodash": "^4.17.20",
@@ -36,6 +33,10 @@
     "qs": "^6.14.0",
     "uuid": "^13.0.0",
     "yargs": "^18.0.0"
+  },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/",
+    "access": "public"
   },
   "main": "dist/univ-lehavre-openalex.cjs.js",
   "module": "dist/univ-lehavre-openalex.esm.js",

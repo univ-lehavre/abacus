@@ -1,6 +1,6 @@
 {
   "name": "@univ-lehavre/ts-matrix",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "Types et fonctions pour les matrices",
   "author": "Pierre-Olivier Chasset",
   "license": "UNLICENSED",
@@ -14,16 +14,17 @@
     "test": "jest",
     "start": "run-s build start:only",
     "start:only": "node ./dist/index.js",
-    "demo": "pnpm -s tsx demo/index.ts",
-    "publish:only": "npm publish --access public",
-    "publish:check": "npm pack --dry-run",
-    "publish": "run-s build publish:only"
+    "demo": "pnpm -s tsx demo/index.ts"
   },
   "devDependencies": {
     "@univ-lehavre/typescript-config": "workspace:^"
   },
   "dependencies": {
     "effect": "^3.17.13"
+  },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/",
+    "access": "public"
   },
   "main": "dist/univ-lehavre-ts-matrix.cjs.js",
   "module": "dist/univ-lehavre-ts-matrix.esm.js",
