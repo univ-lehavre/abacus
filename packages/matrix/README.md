@@ -59,6 +59,34 @@ const D = S.mul(A.transpose()); // CSR x Dense -> Dense
 - `CSRMatrix.set` reconstruit actuellement la structure; pour des mises à jour massives, préférez construire depuis un COO.
 - Les calculs sont en `number` (double précision). Pas de support BigInt/complexe pour l’instant.
 
+## Bench rapide (optionnel)
+
+Un petit script de bench est disponible pour comparer rapidement les temps d’exécution de `CSR × CSR` et `Dense × Dense` en fonction de la taille et de la densité.
+
+Exécution locale:
+
+```bash
+pnpm -C packages/matrix bench
+```
+
+Le script génère deux sections:
+
+- "Bench par taille": multiplie des matrices carrées de tailles croissantes (densité ~5%).
+- "Bench par densité": multiplie des matrices fixes (150×150) avec différentes densités.
+
+Astuce: les mesures varient selon la machine et la charge. Utilisez-les pour comparer des tendances, pas comme des chiffres absolus.
+
 ## Licence
 
 UNLICENSED (interne pour l’instant).
+
+## Documentation API (TypeDoc)
+
+Vous pouvez générer une documentation HTML à partir de la JSDoc via TypeDoc:
+
+```bash
+pnpm -C packages/matrix i
+pnpm -C packages/matrix docs
+```
+
+La doc sera construite dans `packages/matrix/docs`. Pour la prévisualiser dans VS Code, ouvrez le fichier `index.html` dans ce dossier.

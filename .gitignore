@@ -3,3 +3,5 @@
 dist/
 .turbo/
 node_modules/
+docs/
+packages/*/docs/

@@ -17,10 +17,12 @@
     "start": "run-s build start:only",
     "start:only": "node ./dist/index.js",
     "demo": "pnpm -s tsx demo/index.ts",
-    "bench": "pnpm -s tsx demo/bench.ts"
+    "bench": "pnpm -s tsx demo/bench.ts",
+    "docs": "typedoc"
   },
   "devDependencies": {
-    "@univ-lehavre/typescript-config": "workspace:^"
+    "@univ-lehavre/typescript-config": "workspace:^",
+    "typedoc": "^0.27.6"
   },
   "publishConfig": {
     "registry": "https://registry.npmjs.org/",
