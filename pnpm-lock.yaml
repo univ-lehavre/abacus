@@ -66,6 +66,16 @@ importers:
         specifier: ^8.43.0
         version: 8.43.0(eslint@9.35.0)(typescript@5.9.2)
 
+  packages/matrix-class:
+    dependencies:
+      effect:
+        specifier: ^3.17.13
+        version: 3.17.13
+    devDependencies:
+      '@univ-lehavre/typescript-config':
+        specifier: workspace:^
+        version: link:../typescript-config
+
   packages/openalex:
     dependencies:
       '@clack/prompts':
