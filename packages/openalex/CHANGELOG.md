@@ -1,5 +1,13 @@
 # @univ-lehavre/openalex
 
+## 1.0.2
+
+### Patch Changes
+
+- 49297c3: Remove useless scripts
+- Updated dependencies [49297c3]
+  - @univ-lehavre/strings-clustering@1.0.2
+
 ## 1.0.1
 
 ### Patch Changes
