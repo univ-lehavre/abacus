@@ -2,18 +2,42 @@ import type { IMatrix } from './types';
 import { DenseMatrix } from './dense';
 
 /**
- * CSRMatrix: Compressed Sparse Row
- * - values: non-zero values
- * - colIndex: column indices pour chaque valeur
- * - rowPtr: taille rows+1, pointeurs de début de ligne dans values/colIndex
+ * Représentation clairsemée au format CSR (Compressed Sparse Row).
+ *
+ * Stocke uniquement les éléments non nuls ligne par ligne:
+ * - `values[k]` contient la valeur du k-ième élément non nul
+ * - `colIndex[k]` contient l'indice de colonne de `values[k]`
+ * - `rowPtr[i]` est l'offset de début de la ligne i dans `values`/`colIndex`
+ *   (avec `rowPtr.length === rows + 1` et `rowPtr[rows] === values.length`)
+ *
+ * Invariants:
+ * - Pour chaque ligne i, la sous-plage k ∈ [rowPtr[i], rowPtr[i+1]) est triée par `colIndex[k]` strictement croissant.
+ * - `values.length === colIndex.length`
+ *
+ * Avantages: faible mémoire quand la matrice est creuse, itérations par ligne efficaces,
+ * produit matrice-vecteur O(nnz).
  */
 export class CSRMatrix implements IMatrix {
+  /** Nombre de lignes. */
   readonly rows: number;
+  /** Nombre de colonnes. */
   readonly cols: number;
+  /** Valeurs non nulles, de longueur nnz. */
   values: Float64Array;
+  /** Indices de colonnes pour chaque valeur non nulle, de longueur nnz. */
   colIndex: Uint32Array;
+  /** Offsets de début de lignes (taille rows+1). */
   rowPtr: Uint32Array;
 
+  /**
+   * Construit une matrice CSR.
+   * @param rows Nombre de lignes
+   * @param cols Nombre de colonnes
+   * @param values Tableau des valeurs non nulles (taille nnz)
+   * @param colIndex Indices de colonnes associés à chaque valeur (taille nnz)
+   * @param rowPtr Pointeurs de début de lignes (taille rows+1), avec rowPtr[0] = 0 et rowPtr[rows] = nnz
+   * @throws {Error} Si les tailles sont incohérentes ou si rowPtr n’est pas cohérent
+   */
   constructor(
     rows: number,
     cols: number,
@@ -32,6 +56,15 @@ export class CSRMatrix implements IMatrix {
     this.rowPtr = rowPtr;
   }
 
+  /**
+   * Construit une CSR à partir d'une liste de triplets (COO).
+   * Les entrées sont triées par (i, j) et compressées par lignes.
+   * Les valeurs nulles ne sont pas filtrées automatiquement; fournissez des entrées v ≠ 0.
+   * @param rows Nombre de lignes
+   * @param cols Nombre de colonnes
+   * @param entries Triplets (i, j, v) avec 0 ≤ i < rows et 0 ≤ j < cols
+   * @returns CSRMatrix
+   */
   static fromCOO(
     rows: number,
     cols: number,
@@ -58,6 +91,11 @@ export class CSRMatrix implements IMatrix {
     return new CSRMatrix(rows, cols, values, colIndex, rowPtr);
   }
 
+  /**
+   * Convertit une matrice dense en CSR en collectant les valeurs non nulles.
+   * @param A Matrice dense source
+   * @returns CSRMatrix équivalente
+   */
   static fromDense(A: DenseMatrix): CSRMatrix {
     const rows = A.rows,
       cols = A.cols;
@@ -71,6 +109,12 @@ export class CSRMatrix implements IMatrix {
     return CSRMatrix.fromCOO(rows, cols, triplets);
   }
 
+  /**
+   * Retourne la valeur A[i,j]. Renvoie 0 si l’entrée n’existe pas dans la structure CSR.
+   * @param i Ligne (0 ≤ i < rows)
+   * @param j Colonne (0 ≤ j < cols)
+   * @throws {RangeError} Si i ou j sont hors bornes
+   */
   get(i: number, j: number): number {
     if (i < 0 || i >= this.rows || j < 0 || j >= this.cols)
       throw new RangeError('Indice hors limites');
@@ -83,6 +127,14 @@ export class CSRMatrix implements IMatrix {
     return 0;
   }
 
+  /**
+   * Modifie la valeur A[i,j]. Opération coûteuse: la structure est reconstruite naïvement.
+   * Pour des mises à jour massives, préférez construire depuis un COO ou un builder dédié.
+   * @param i Ligne (0 ≤ i < rows)
+   * @param j Colonne (0 ≤ j < cols)
+   * @param value Nouvelle valeur
+   * @throws {RangeError} Si i ou j sont hors bornes
+   */
   set(i: number, j: number, value: number): void {
     // Opération coûteuse; ici version simple (reconstruction locale)
     if (i < 0 || i >= this.rows || j < 0 || j >= this.cols)
@@ -113,6 +165,12 @@ export class CSRMatrix implements IMatrix {
     this.rowPtr = rebuilt.rowPtr;
   }
 
+  /**
+   * Addition matricielle A + B. Si B est CSR, renvoie une CSR; sinon conversion dense.
+   * @param B Matrice de même dimensions
+   * @returns Nouvelle matrice (CSR si B est CSR)
+   * @throws {Error} Si les dimensions sont incompatibles
+   */
   add(B: IMatrix): IMatrix {
     if (this.rows !== B.rows || this.cols !== B.cols)
       throw new Error('Dimensions incompatibles pour add');
@@ -146,6 +204,12 @@ export class CSRMatrix implements IMatrix {
     return this.toDense().add(B);
   }
 
+  /**
+   * Soustraction matricielle A - B. Si B est CSR, renvoie une CSR; sinon conversion dense.
+   * @param B Matrice de même dimensions
+   * @returns Nouvelle matrice (CSR si B est CSR)
+   * @throws {Error} Si les dimensions sont incompatibles
+   */
   sub(B: IMatrix): IMatrix {
     if (this.rows !== B.rows || this.cols !== B.cols)
       throw new Error('Dimensions incompatibles pour sub');
@@ -177,6 +241,15 @@ export class CSRMatrix implements IMatrix {
     return this.toDense().sub(B);
   }
 
+  /**
+   * Multiplication par scalaire ou produit matriciel.
+   * - Si B est un nombre: renvoie une CSR avec valeurs mises à l’échelle.
+   * - Si B est Dense: renvoie une DenseMatrix (chemin optimisé CSR*Dense → Dense).
+   * - Si B est CSR: renvoie une CSR (algorithme deux passes: précomptage puis accumulation).
+   * @param B Scalaire ou matrice à multiplier
+   * @returns Nouvelle matrice (CSR si A et B sont CSR)
+   * @throws {Error} Si les dimensions sont incompatibles pour un produit matriciel
+   */
   mul(B: number | IMatrix): IMatrix {
     if (typeof B === 'number') {
       const scaled = new Float64Array(this.values.length);
@@ -321,6 +394,10 @@ export class CSRMatrix implements IMatrix {
     return this.mul(B.toDense());
   }
 
+  /**
+   * Transposée de la matrice (CSR -> CSR) via reconstruction à partir d’un COO transposé.
+   * @returns CSRMatrix transposée
+   */
   transpose(): IMatrix {
     // Transposition via COO puis reconstruction
     const entries: Array<{ i: number; j: number; v: number }> = [];
@@ -332,6 +409,12 @@ export class CSRMatrix implements IMatrix {
     return CSRMatrix.fromCOO(this.cols, this.rows, entries);
   }
 
+  /**
+   * Produit matrice-vecteur y = A x.
+   * @param x Vecteur de taille `cols`
+   * @returns y de taille `rows`
+   * @throws {Error} Si la taille du vecteur est incompatible
+   */
   matvec(x: Float64Array): Float64Array {
     if (x.length !== this.cols) throw new Error('Taille du vecteur incompatible');
     const y = new Float64Array(this.rows);
@@ -345,6 +428,10 @@ export class CSRMatrix implements IMatrix {
     return y;
   }
 
+  /**
+   * Conversion vers une matrice Dense équivalente.
+   * @returns DenseMatrix copie des données
+   */
   toDense(): DenseMatrix {
     const A = new DenseMatrix(this.rows, this.cols);
     for (let i = 0; i < this.rows; i++) {

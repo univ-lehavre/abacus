@@ -16,7 +16,8 @@
     "test": "jest",
     "start": "run-s build start:only",
     "start:only": "node ./dist/index.js",
-    "demo": "pnpm -s tsx demo/index.ts"
+    "demo": "pnpm -s tsx demo/index.ts",
+    "bench": "pnpm -s tsx demo/bench.ts"
   },
   "devDependencies": {
     "@univ-lehavre/typescript-config": "workspace:^"
