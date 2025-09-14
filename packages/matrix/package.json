@@ -1,6 +1,6 @@
 {
   "name": "@univ-lehavre/matrix",
-  "version": "1.0.0-alpha",
+  "version": "1.0.0",
   "description": "Une classe pour le calcul matriciel en TypeScript",
   "author": "Pierre-Olivier Chasset",
   "license": "UNLICENSED",
