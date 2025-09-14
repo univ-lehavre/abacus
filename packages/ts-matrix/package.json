@@ -1,0 +1,24 @@
+{
+  "name": "@univ-lehavre/ts-matrix",
+  "version": "1.0.0-theta",
+  "description": "Types et fonctions pour les matrices",
+  "author": "Pierre-Olivier Chasset",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "effect": "^3.17.13"
+  },
+  "main": "dist/univ-lehavre-ts-matrix.cjs.js",
+  "module": "dist/univ-lehavre-ts-matrix.esm.js",
+  "exports": {
+    ".": {
+      "types": {
+        "import": "./dist/univ-lehavre-ts-matrix.cjs.mjs",
+        "default": "./dist/univ-lehavre-ts-matrix.cjs.js"
+      },
+      "module": "./dist/univ-lehavre-ts-matrix.esm.js",
+      "import": "./dist/univ-lehavre-ts-matrix.cjs.mjs",
+      "default": "./dist/univ-lehavre-ts-matrix.cjs.js"
+    },
+    "./package.json": "./package.json"
+  }
+}
