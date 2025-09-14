@@ -1,6 +1,6 @@
 {
   "name": "@univ-lehavre/ts-matrix",
-  "version": "1.0.0-theta",
+  "version": "1.0.0",
   "description": "Types et fonctions pour les matrices",
   "author": "Pierre-Olivier Chasset",
   "license": "UNLICENSED",

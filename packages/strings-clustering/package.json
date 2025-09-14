@@ -1,6 +1,6 @@
 {
   "name": "@univ-lehavre/strings-clustering",
-  "version": "1.0.0-beta",
+  "version": "1.0.0",
   "description": "Regroupement de chaînes de caractères par similarité",
   "author": "Pierre-Olivier Chasset",
   "license": "UNLICENSED",
