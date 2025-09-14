@@ -109,16 +109,41 @@ export class DenseMatrix {
 
   dot(B: DenseMatrix): DenseMatrix {
     if (this.ncol !== B.nrow) throw new Error('Incompatible matrix dimensions');
-    const out = new Array(this.nrow * B.ncol).fill(0);
-    for (let i = 0; i < this.nrow; i++) {
-      for (let j = 0; j < B.ncol; j++) {
-        for (let k = 0; k < this.ncol; k++) {
-          out[i * B.ncol + j] += this.data[i * this.ncol + k] * B.data[k * B.ncol + j];
-        }
+
+    // Accès local aux buffers pour réduire les lectures de propriétés
+    const aData = this.data;
+    const bData = B.data;
+    const aNrow = this.nrow;
+    const aNcol = this.ncol;
+    const bNrow = B.nrow;
+    const bNcol = B.ncol;
+
+    // Transpose B pour améliorer la localité lors du produit matriciel.
+    // Bt is laid out so that rows correspond to original columns of B.
+    const Bt: number[] = new Array(bNcol * bNrow);
+    for (let r = 0; r < bNrow; r++) {
+      const rowOffset = r * bNcol;
+      for (let c = 0; c < bNcol; c++) {
+        Bt[c * bNrow + r] = bData[rowOffset + c];
       }
     }
+
+    const out = new Array(aNrow * bNcol).fill(0);
+
+    for (let i = 0; i < aNrow; i++) {
+      const aRow = i * aNcol;
+      for (let j = 0; j < bNcol; j++) {
+        let sum = 0;
+        const btRow = j * bNrow;
+        for (let k = 0; k < aNcol; k++) {
+          sum += aData[aRow + k] * Bt[btRow + k];
+        }
+        out[i * bNcol + j] = sum;
+      }
+    }
+
     return new DenseMatrix(out, {
-      ncol: B.ncol,
+      ncol: bNcol,
       nonNegative: this.isNonNegative && B.isNonNegative,
     });
   }
