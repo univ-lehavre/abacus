@@ -1,0 +1,14 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "entryPoints": ["src/index.ts"],
+  "out": "docs",
+  "tsconfig": "tsconfig.json",
+  "readme": "none",
+  "excludePrivate": true,
+  "excludeProtected": false,
+  "excludeInternal": true,
+  "treatWarningsAsErrors": false,
+  "categorizeByGroup": true,
+  "sort": ["source-order", "alphabetical"],
+  "githubPages": false
+}

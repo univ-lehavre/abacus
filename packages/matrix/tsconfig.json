@@ -1,0 +1,4 @@
+{
+  "extends": "@univ-lehavre/typescript-config/base.json",
+  "include": ["./src/**/*.ts"]
+}

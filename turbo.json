@@ -17,6 +17,10 @@
     "test": {
       "dependsOn": ["^test"]
     },
+    "docs": {
+      "dependsOn": ["^docs"],
+      "outputs": ["docs/**"]
+    },
     "clean": {
       "dependsOn": ["^clean"],
       "cache": false
