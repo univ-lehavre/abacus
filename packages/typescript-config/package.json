@@ -1,0 +1,10 @@
+{
+  "name": "@univ-lehavre/typescript-config",
+  "version": "1.0.0",
+  "description": "Configuration TypeScript partagée pour les projets d’Abacus",
+  "author": "Pierre-Olivier Chasset",
+  "license": "UNLICENSED",
+  "devDependencies": {
+    "@tsconfig/node22": "^22.0.2"
+  }
+}

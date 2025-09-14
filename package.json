@@ -5,24 +5,18 @@
     "packages/*"
   ],
   "scripts": {
-    "build": "run-s clean types:check lint format:check test build:once",
-    "build:once": "preconstruct build",
-    "build:watch": "preconstruct watch",
-    "clean": "rm -fR dist",
-    "types:check": "tsc --noEmit",
-    "lint": "eslint \"src/**/*.{ts,js}\" --max-warnings=0",
-    "lint:fix": "eslint \"src/**/*.{ts,js}\" --fix",
-    "format": "prettier --write \"src/**/*.{ts,js,tsx,jsx,json,md}\"",
-    "format:check": "prettier --check \"src/**/*.{ts,js,tsx,jsx,json,md}\"",
-    "test": "jest",
-    "changeset": "npx @changesets/cli",
-    "bump": "npx @changesets/cli version",
-    "start": "run-s build start:only",
-    "start:only": "node ./dist/index.js",
-    "demo": "pnpm -s tsx demo/index.ts",
-    "publish:only": "npm publish --access public",
-    "publish:check": "npm pack --dry-run",
-    "publish": "run-s build publish:only"
+    "build": "turbo run build",
+    "build:checked": "turbo run build types:check lint format:check test",
+    "types:check": "turbo run types:check",
+    "format": "turbo run format",
+    "format:check": "turbo run format:check",
+    "lint": "turbo run lint",
+    "test": "turbo run test",
+    "clean": "turbo run clean",
+    "dev": "turbo run dev",
+    "changeset": "pnpm dlx @changesets/cli",
+    "bump": "pnpm dlx @changesets/cli version",
+    "publish-packages": "pnpm build:checked && pnpm run changeset && pnpm run bump && pnpm publish"
   },
   "devDependencies": {
     "@babel/cli": "^7.28.3",
@@ -31,7 +25,6 @@
     "@babel/preset-typescript": "^7.27.1",
     "@eslint/js": "^9.35.0",
     "@preconstruct/cli": "^2.8.12",
-    "@tsconfig/node22": "^22.0.2",
     "@types/jest": "^29.5.14",
     "@types/node": "^24.3.1",
     "eslint": "^9.35.0",
@@ -42,26 +35,12 @@
     "ts-jest": "^29.4.1",
     "ts-node": "^10.9.2",
     "tsx": "^3.14.0",
+    "turbo": "^2.5.6",
     "typescript": "^5.9.2",
     "typescript-eslint": "^8.43.0"
   },
+  "packageManager": "pnpm@10.16.1",
   "engines": {
-    "node": ">=22.19"
-  },
-  "babel": {
-    "targets": {
-      "node": "22.19"
-    },
-    "presets": [
-      "@babel/preset-env"
-    ],
-    "overrides": [
-      {
-        "test": "**/*.ts",
-        "presets": [
-          "@babel/preset-typescript"
-        ]
-      }
-    ]
+    "node": ">=22.19.0"
   }
 }
