@@ -56,6 +56,10 @@ export class DenseMatrix {
     return this.ncol;
   }
 
+  getData(): number[] {
+    return this.data;
+  }
+
   static is2D(data: number[] | number[][]): boolean {
     return Array.isArray(data) && data.every(Array.isArray);
   }
@@ -103,6 +107,32 @@ export class DenseMatrix {
     return this.data[rowIndex * this.ncol + colIndex];
   }
 
+  dot(B: DenseMatrix): DenseMatrix {
+    if (this.ncol !== B.nrow) throw new Error('Incompatible matrix dimensions');
+    const out = new Array(this.nrow * B.ncol).fill(0);
+    for (let i = 0; i < this.nrow; i++) {
+      for (let j = 0; j < B.ncol; j++) {
+        for (let k = 0; k < this.ncol; k++) {
+          out[i * B.ncol + j] += this.data[i * this.ncol + k] * B.data[k * B.ncol + j];
+        }
+      }
+    }
+    return new DenseMatrix(out, {
+      ncol: B.ncol,
+      nonNegative: this.isNonNegative && B.isNonNegative,
+    });
+  }
+
+  eldiv(B: DenseMatrix): DenseMatrix {
+    if (this.ncol !== B.ncol || this.nrow !== B.nrow)
+      throw new Error('Incompatible matrix dimensions');
+    const out = this.data.map((v, i) => (B.data[i] === 0 ? 0 : v / B.data[i]));
+    return new DenseMatrix(out, {
+      ncol: this.ncol,
+      nonNegative: this.isNonNegative && B.isNonNegative,
+    });
+  }
+
   transpose(): number[][] {
     const matrix2D = this.to2D();
     const transposed: number[][] = [];
@@ -113,9 +143,5 @@ export class DenseMatrix {
       }
     }
     return transposed;
-  }
-
-  getData(): number[] {
-    return this.data;
   }
 }
