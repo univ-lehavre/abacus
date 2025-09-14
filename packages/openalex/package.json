@@ -37,6 +37,10 @@
     "uuid": "^13.0.0",
     "yargs": "^18.0.0"
   },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/",
+    "access": "public"
+  },
   "main": "dist/univ-lehavre-openalex.cjs.js",
   "module": "dist/univ-lehavre-openalex.esm.js",
   "exports": {

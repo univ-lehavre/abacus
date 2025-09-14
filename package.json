@@ -16,7 +16,7 @@
     "dev": "turbo run dev",
     "changeset": "pnpm dlx @changesets/cli",
     "bump": "pnpm dlx @changesets/cli version",
-    "publish-packages": "pnpm build:checked && pnpm run changeset && pnpm run bump && pnpm publish"
+    "publish-packages": "pnpm build:checked && pnpm run changeset && pnpm run bump && pnpm dlx @changesets/cli publish"
   },
   "devDependencies": {
     "@babel/cli": "^7.28.3",

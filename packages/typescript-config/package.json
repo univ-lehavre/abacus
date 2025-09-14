@@ -6,5 +6,9 @@
   "license": "UNLICENSED",
   "devDependencies": {
     "@tsconfig/node22": "^22.0.2"
+  },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/",
+    "access": "public"
   }
 }

@@ -26,6 +26,10 @@
     "@univ-lehavre/ts-matrix": "workspace:^",
     "effect": "^3.17.13"
   },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/",
+    "access": "public"
+  },
   "main": "dist/univ-lehavre-strings-clustering.cjs.js",
   "module": "dist/univ-lehavre-strings-clustering.esm.js",
   "exports": {
