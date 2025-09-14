@@ -150,6 +150,112 @@ describe('CSRMatrix', () => {
     const D = C.toDense();
     expect(D.get(0, 0)).toBe(0);
   });
+
+  test('mul CSR*CSR avec annulations multiples sur différentes colonnes', () => {
+    // A: 1x3
+    // On veut C[0,0]=0 et C[0,2]=0 par annulations, et C[0,1] non nul
+    const A = CSRMatrix.fromCOO(1, 3, [
+      { i: 0, j: 0, v: 2 },
+      { i: 0, j: 1, v: -1 },
+      { i: 0, j: 2, v: 3 },
+    ]);
+    // B: 3x3
+    // Choix pour obtenir:
+    // C[0,0] = 2*1 + (-1)*2 + 3*0 = 0
+    // C[0,2] = 2*3 + (-1)*6 + 3*0 = 0
+    // C[0,1] = 2*1 + (-1)*0 + 3*2 = 8
+    const B = CSRMatrix.fromCOO(3, 3, [
+      // ligne 0
+      { i: 0, j: 0, v: 1 },
+      { i: 0, j: 1, v: 1 },
+      { i: 0, j: 2, v: 3 },
+      // ligne 1
+      { i: 1, j: 0, v: 2 },
+      { i: 1, j: 2, v: 6 },
+      // ligne 2
+      { i: 2, j: 1, v: 2 },
+    ]);
+    const C = A.mul(B) as CSRMatrix;
+    const D = C.toDense();
+    expect(D.get(0, 0)).toBe(0);
+    expect(D.get(0, 1)).toBe(8);
+    expect(D.get(0, 2)).toBe(0);
+    // Vérifie aussi l’absence d’entrées pour les zéros
+    expect(C.get(0, 0)).toBe(0);
+    expect(C.get(0, 2)).toBe(0);
+  });
+
+  test("stabilité d'ordre: colonnes triées par ligne dans le résultat", () => {
+    // Construire A et B pour produire plusieurs colonnes dans une même ligne de C
+    const A = CSRMatrix.fromCOO(2, 4, [
+      { i: 0, j: 3, v: 1 },
+      { i: 0, j: 1, v: 2 },
+      { i: 1, j: 0, v: 1 },
+      { i: 1, j: 2, v: 1 },
+    ]);
+    const B = CSRMatrix.fromCOO(4, 5, [
+      // ligne 1 (pour A[0,1]=2) -> colonnes 4 et 2
+      { i: 1, j: 4, v: 1 },
+      { i: 1, j: 2, v: 1 },
+      // ligne 3 (pour A[0,3]=1) -> colonnes 3 et 1
+      { i: 3, j: 1, v: 1 },
+      { i: 3, j: 3, v: 1 },
+      // ligne 0 (pour A[1,0]=1) -> colonne 2
+      { i: 0, j: 2, v: 1 },
+      // ligne 2 (pour A[1,2]=1) -> colonne 4
+      { i: 2, j: 4, v: 1 },
+    ]);
+    const C = A.mul(B) as CSRMatrix;
+    // Pour chaque ligne, vérifier que les colonnes sont strictement croissantes
+    for (let i = 0; i < C.rows; i++) {
+      const start = C.rowPtr[i];
+      const end = C.rowPtr[i + 1];
+      for (let k = start + 1; k < end; k++) {
+        expect(C.colIndex[k]).toBeGreaterThan(C.colIndex[k - 1]);
+      }
+    }
+  });
+
+  test('matrices rectangulaires plus grandes 4x6 * 6x5', () => {
+    const A = CSRMatrix.fromCOO(4, 6, [
+      { i: 0, j: 0, v: 1 },
+      { i: 0, j: 5, v: 2 },
+      { i: 1, j: 2, v: 3 },
+      { i: 2, j: 1, v: -1 },
+      { i: 2, j: 3, v: 4 },
+      { i: 3, j: 4, v: 5 },
+    ]);
+    const B = CSRMatrix.fromCOO(6, 5, [
+      // k=0 -> col1
+      { i: 0, j: 1, v: 2 },
+      // k=1 -> col2
+      { i: 1, j: 2, v: 2 },
+      // k=2 -> cols 0 et 3
+      { i: 2, j: 0, v: 1 },
+      { i: 2, j: 3, v: 1 },
+      // k=3 -> cols 0 et 2
+      { i: 3, j: 0, v: -1 },
+      { i: 3, j: 2, v: 3 },
+      // k=4 -> col1
+      { i: 4, j: 1, v: 1 },
+      // k=5 -> col4
+      { i: 5, j: 4, v: 7 },
+    ]);
+    const C = A.mul(B) as CSRMatrix;
+    const Cd = C.toDense();
+    // Calcul dense de référence
+    const Ad = A.toDense();
+    const Bd = B.toDense();
+    const Ref = Ad.mul(Bd) as DenseMatrix;
+    // Vérifier toutes les cases (4x5)
+    for (let i = 0; i < 4; i++) {
+      for (let j = 0; j < 5; j++) {
+        const got = Cd.get(i, j);
+        const exp = Ref.get(i, j);
+        expect(got).toBe(exp);
+      }
+    }
+  });
 });
 
 describe('CSR × CSR → CSR', () => {

@@ -210,46 +210,113 @@ export class CSRMatrix implements IMatrix {
       return C;
     }
     if (B instanceof CSRMatrix) {
-      // CSR * CSR -> CSR (algorithme de Gustavson par ligne)
+      // CSR * CSR -> CSR
+      // Implémentation deux passes avec précomptage des nnz par ligne
       const rows = this.rows;
       const cols = B.cols;
-      const outRowPtr = new Uint32Array(rows + 1);
-      const outValues: number[] = [];
-      const outColIndex: number[] = [];
 
+      // Pass 1: compter le nombre d'indices colonnes uniques par ligne du résultat
+      const rowCounts = new Uint32Array(rows);
+      const marker = new Int32Array(cols);
+      marker.fill(-1);
       for (let i = 0; i < rows; i++) {
-        const acc = new Map<number, number>();
         const aStart = this.rowPtr[i];
         const aEnd = this.rowPtr[i + 1];
-        for (let kk = aStart; kk < aEnd; kk++) {
-          const k = this.colIndex[kk]; // colonne de A (donc ligne de B)
-          const a = this.values[kk];
-          if (a === 0) continue;
+        for (let ak = aStart; ak < aEnd; ak++) {
+          const k = this.colIndex[ak];
           const bStart = B.rowPtr[k];
           const bEnd = B.rowPtr[k + 1];
-          for (let t = bStart; t < bEnd; t++) {
-            const j = B.colIndex[t];
-            const prod = a * B.values[t];
+          for (let bk = bStart; bk < bEnd; bk++) {
+            const j = B.colIndex[bk];
+            if (marker[j] !== i) {
+              marker[j] = i;
+              rowCounts[i]++;
+            }
+          }
+        }
+      }
+
+      // Préfixe pour rowPtr (borne supérieure, avant élagage des zéros après accumulation)
+      const rowPtr = new Uint32Array(rows + 1);
+      for (let r = 0; r < rows; r++) rowPtr[r + 1] = rowPtr[r] + rowCounts[r];
+      const cap = rowPtr[rows];
+      const values = new Float64Array(cap);
+      const colIndex = new Uint32Array(cap);
+
+      // Pass 2: accumuler les valeurs dans les buffers alloués
+      // Utilise marker et une table de position pour placer/sommer
+      marker.fill(-1);
+      const pos = new Int32Array(cols);
+      for (let i = 0; i < rows; i++) {
+        let cursor = rowPtr[i];
+        const aStart = this.rowPtr[i];
+        const aEnd = this.rowPtr[i + 1];
+        for (let ak = aStart; ak < aEnd; ak++) {
+          const k = this.colIndex[ak];
+          const aik = this.values[ak];
+          if (aik === 0) continue;
+          const bStart = B.rowPtr[k];
+          const bEnd = B.rowPtr[k + 1];
+          for (let bk = bStart; bk < bEnd; bk++) {
+            const j = B.colIndex[bk];
+            const prod = aik * B.values[bk];
             if (prod === 0) continue;
-            const prev = acc.get(j) ?? 0;
-            const sum = prev + prod;
-            if (sum !== 0) acc.set(j, sum);
-            else acc.delete(j); // élaguer les zéros exacts
+            if (marker[j] !== i) {
+              marker[j] = i;
+              pos[j] = cursor;
+              colIndex[cursor] = j;
+              values[cursor] = prod;
+              cursor++;
+            } else {
+              values[pos[j]] += prod;
+            }
           }
         }
 
-        // Ranger par colonne croissante pour respecter l'invariant CSR
-        const js = Array.from(acc.keys()).sort((x, y) => x - y);
-        for (const j of js) {
-          outColIndex.push(j);
-          outValues.push(acc.get(j)!);
+        // Compacter la ligne: trier par colonnes, fusionner doublons éventuels, supprimer zéros
+        const start = rowPtr[i];
+        const len = cursor - start;
+        if (len <= 0) {
+          rowPtr[i + 1] = start;
+        } else {
+          // Copier la portion de ligne pour éviter l'écrasement lors du tri
+          const colsTmp = new Uint32Array(len);
+          const valsTmp = new Float64Array(len);
+          for (let t = 0; t < len; t++) {
+            colsTmp[t] = colIndex[start + t];
+            valsTmp[t] = values[start + t];
+          }
+          // Indices locaux [0..len)
+          const order: number[] = new Array(len);
+          for (let t = 0; t < len; t++) order[t] = t;
+          order.sort((a, b) => colsTmp[a] - colsTmp[b]);
+          // Réécriture compacte triée avec fusion et élagage
+          let w = start;
+          for (let idx = 0; idx < order.length; idx++) {
+            const t = order[idx];
+            const j = colsTmp[t];
+            const v = valsTmp[t];
+            if (v === 0) continue;
+            if (w > start && j === colIndex[w - 1]) {
+              // fusionner avec l'entrée précédente
+              const sum = values[w - 1] + v;
+              if (sum !== 0) values[w - 1] = sum;
+              else w--; // supprime l'entrée si annulation exacte
+            } else {
+              colIndex[w] = j;
+              values[w] = v;
+              w++;
+            }
+          }
+          rowPtr[i + 1] = w;
         }
-        outRowPtr[i + 1] = outRowPtr[i] + js.length;
       }
 
-      const values = new Float64Array(outValues);
-      const colIndex = new Uint32Array(outColIndex);
-      return new CSRMatrix(rows, cols, values, colIndex, outRowPtr);
+      // Taille finale après élagage
+      const nnz = rowPtr[rows];
+      const outValues = values.slice(0, nnz);
+      const outColIndex = colIndex.slice(0, nnz);
+      return new CSRMatrix(rows, cols, outValues, outColIndex, rowPtr);
     }
     return this.mul(B.toDense());
   }
