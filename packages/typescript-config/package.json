@@ -1,6 +1,6 @@
 {
   "name": "@univ-lehavre/typescript-config",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Configuration TypeScript partagée pour les projets d’Abacus",
   "author": "Pierre-Olivier Chasset",
   "license": "UNLICENSED",
