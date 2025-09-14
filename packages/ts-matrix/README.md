@@ -1,1 +1,0 @@
-# Immutable Matrix TypeScript utilities

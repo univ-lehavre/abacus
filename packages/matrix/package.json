@@ -1,5 +1,5 @@
 {
-  "name": "@univ-lehavre/matrix-class",
+  "name": "@univ-lehavre/matrix",
   "version": "1.0.0-alpha",
   "description": "Une classe pour le calcul matriciel en TypeScript",
   "author": "Pierre-Olivier Chasset",
@@ -21,24 +21,21 @@
   "devDependencies": {
     "@univ-lehavre/typescript-config": "workspace:^"
   },
-  "dependencies": {
-    "effect": "^3.17.13"
-  },
   "publishConfig": {
     "registry": "https://registry.npmjs.org/",
     "access": "public"
   },
-  "main": "dist/univ-lehavre-matrix-class.cjs.js",
-  "module": "dist/univ-lehavre-matrix-class.esm.js",
+  "main": "dist/univ-lehavre-matrix.cjs.js",
+  "module": "dist/univ-lehavre-matrix.esm.js",
   "exports": {
     ".": {
       "types": {
-        "import": "./dist/univ-lehavre-matrix-class.cjs.mjs",
-        "default": "./dist/univ-lehavre-matrix-class.cjs.js"
+        "import": "./dist/univ-lehavre-matrix.cjs.mjs",
+        "default": "./dist/univ-lehavre-matrix.cjs.js"
       },
-      "module": "./dist/univ-lehavre-matrix-class.esm.js",
-      "import": "./dist/univ-lehavre-matrix-class.cjs.mjs",
-      "default": "./dist/univ-lehavre-matrix-class.cjs.js"
+      "module": "./dist/univ-lehavre-matrix.esm.js",
+      "import": "./dist/univ-lehavre-matrix.cjs.mjs",
+      "default": "./dist/univ-lehavre-matrix.cjs.js"
     },
     "./package.json": "./package.json"
   },
