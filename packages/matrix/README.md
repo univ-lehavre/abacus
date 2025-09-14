@@ -49,13 +49,13 @@ const D = S.mul(A.transpose()); // CSR x Dense -> Dense
   - `static from2D`, `static identity`, `static zeros`
 - `CSRMatrix` (Compressed Sparse Row)
   - `fromCOO(rows, cols, entries)` et `fromDense(DenseMatrix)`
-  - `get/set`, `add/sub`, `mul(number|IMatrix)`, `transpose`, `matvec`, `toDense`
+  - `get/set`, `add/sub`, `mul(number|IMatrix)` dont `CSR × CSR → CSR` optimisé (Gustavson), `transpose`, `matvec`, `toDense`
 - Helpers
   - `zeros(rows, cols)`, `identity(n)`, `from2D(values)`
 
 ## Notes de perf et limites
 
-- Les opérations mixant dense et CSR privilégient des chemins optimisés (ex: CSR \* Dense) sinon convertissent vers Dense pour la simplicité.
+- Les opérations mixant dense et CSR privilégient des chemins optimisés (ex: CSR \* Dense). CSR × CSR est maintenant optimisé et renvoie une CSR sans conversion intermédiaire.
 - `CSRMatrix.set` reconstruit actuellement la structure; pour des mises à jour massives, préférez construire depuis un COO.
 - Les calculs sont en `number` (double précision). Pas de support BigInt/complexe pour l’instant.
 

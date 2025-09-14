@@ -210,8 +210,46 @@ export class CSRMatrix implements IMatrix {
       return C;
     }
     if (B instanceof CSRMatrix) {
-      // CSR * CSR -> Dense par défaut (plus simple); optimisation future: CSR output
-      return this.mul(B.toDense());
+      // CSR * CSR -> CSR (algorithme de Gustavson par ligne)
+      const rows = this.rows;
+      const cols = B.cols;
+      const outRowPtr = new Uint32Array(rows + 1);
+      const outValues: number[] = [];
+      const outColIndex: number[] = [];
+
+      for (let i = 0; i < rows; i++) {
+        const acc = new Map<number, number>();
+        const aStart = this.rowPtr[i];
+        const aEnd = this.rowPtr[i + 1];
+        for (let kk = aStart; kk < aEnd; kk++) {
+          const k = this.colIndex[kk]; // colonne de A (donc ligne de B)
+          const a = this.values[kk];
+          if (a === 0) continue;
+          const bStart = B.rowPtr[k];
+          const bEnd = B.rowPtr[k + 1];
+          for (let t = bStart; t < bEnd; t++) {
+            const j = B.colIndex[t];
+            const prod = a * B.values[t];
+            if (prod === 0) continue;
+            const prev = acc.get(j) ?? 0;
+            const sum = prev + prod;
+            if (sum !== 0) acc.set(j, sum);
+            else acc.delete(j); // élaguer les zéros exacts
+          }
+        }
+
+        // Ranger par colonne croissante pour respecter l'invariant CSR
+        const js = Array.from(acc.keys()).sort((x, y) => x - y);
+        for (const j of js) {
+          outColIndex.push(j);
+          outValues.push(acc.get(j)!);
+        }
+        outRowPtr[i + 1] = outRowPtr[i] + js.length;
+      }
+
+      const values = new Float64Array(outValues);
+      const colIndex = new Uint32Array(outColIndex);
+      return new CSRMatrix(rows, cols, values, colIndex, outRowPtr);
     }
     return this.mul(B.toDense());
   }
