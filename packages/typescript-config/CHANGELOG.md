@@ -1,5 +1,11 @@
 # @univ-lehavre/typescript-config
 
+## 1.1.3
+
+### Patch Changes
+
+- 1ab857e: Le registre des paquets est désormais GitHub
+
 ## 1.1.2
 
 ### Patch Changes
