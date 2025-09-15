@@ -1,5 +1,11 @@
 # @univ-lehavre/typescript-config
 
+## 1.1.4
+
+### Patch Changes
+
+- 5c20f92: Ajout d’un dépôt spécifique par package
+
 ## 1.1.3
 
 ### Patch Changes

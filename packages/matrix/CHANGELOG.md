@@ -1,5 +1,11 @@
 # @univ-lehavre/matrix
 
+## 1.0.2
+
+### Patch Changes
+
+- 5c20f92: Ajout d’un dépôt spécifique par package
+
 ## 1.0.1
 
 ### Patch Changes
