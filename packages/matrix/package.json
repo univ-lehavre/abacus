@@ -4,6 +4,7 @@
   "description": "Une classe pour le calcul matriciel en TypeScript",
   "author": "Pierre-Olivier Chasset",
   "license": "UNLICENSED",
+  "repository": "https://github.com/@univ-lehavre/abacus",
   "scripts": {
     "build": "preconstruct build",
     "dev": "preconstruct watch",
