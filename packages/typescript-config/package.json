@@ -8,7 +8,7 @@
     "@tsconfig/node22": "^22.0.2"
   },
   "publishConfig": {
-    "registry": "https://registry.npmjs.org/",
+    "registry": "https://npm.pkg.github.com",
     "access": "public"
   }
 }
