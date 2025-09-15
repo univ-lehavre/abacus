@@ -1,9 +1,10 @@
 {
   "name": "@univ-lehavre/matrix",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "Une classe pour le calcul matriciel en TypeScript",
   "author": "Pierre-Olivier Chasset",
   "license": "UNLICENSED",
+  "repository": "https://github.com/@univ-lehavre/abacus",
   "scripts": {
     "build": "preconstruct build",
     "dev": "preconstruct watch",
@@ -25,7 +26,7 @@
     "typedoc": "^0.27.6"
   },
   "publishConfig": {
-    "registry": "https://registry.npmjs.org/",
+    "registry": "https://npm.pkg.github.com",
     "access": "public"
   },
   "main": "dist/univ-lehavre-matrix.cjs.js",

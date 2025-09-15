@@ -1,6 +1,7 @@
 import { DenseMatrix } from './dense';
 export { DenseMatrix } from './dense';
 export { CSRMatrix } from './csr';
+export { Matrix } from './matrix';
 export type { IMatrix, Shape } from './types';
 
 // Helpers

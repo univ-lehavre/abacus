@@ -1,5 +1,17 @@
 # @univ-lehavre/typescript-config
 
+## 1.1.4
+
+### Patch Changes
+
+- 5c20f92: Ajout d’un dépôt spécifique par package
+
+## 1.1.3
+
+### Patch Changes
+
+- 1ab857e: Le registre des paquets est désormais GitHub
+
 ## 1.1.2
 
 ### Patch Changes
