@@ -5,11 +5,11 @@
   "author": "Pierre-Olivier Chasset",
   "license": "UNLICENSED",
   "repository": "https://github.com/@univ-lehavre/abacus",
-  "devDependencies": {
-    "@tsconfig/node22": "^22.0.2"
-  },
   "publishConfig": {
     "registry": "https://npm.pkg.github.com",
     "access": "public"
+  },
+  "dependencies": {
+    "@tsconfig/node22": "^22.0.2"
   }
 }
