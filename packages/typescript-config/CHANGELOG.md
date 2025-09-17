@@ -1,5 +1,11 @@
 # @univ-lehavre/typescript-config
 
+## 2.0.0
+
+### Major Changes
+
+- 52c169f: Déplacement d’une dépendance en production
+
 ## 1.1.4
 
 ### Patch Changes
