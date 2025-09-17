@@ -76,7 +76,7 @@ importers:
         version: 0.27.9(typescript@5.9.2)
 
   packages/typescript-config:
-    devDependencies:
+    dependencies:
       '@tsconfig/node22':
         specifier: ^22.0.2
         version: 22.0.2

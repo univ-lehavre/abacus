@@ -1,5 +1,11 @@
 # @univ-lehavre/matrix
 
+## 1.0.3
+
+### Patch Changes
+
+- 65c4af7: Une dépendance a été modifiée
+
 ## 1.0.2
 
 ### Patch Changes
